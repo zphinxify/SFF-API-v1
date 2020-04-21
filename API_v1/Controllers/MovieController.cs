@@ -41,21 +41,6 @@ namespace API_v1.Controllers
             await _context.SaveChangesAsync();
             return movieToChange;
         }
-        
-        // PUT: Update maxAmount and set isRented = true 
-        [HttpPut("movieisrented/{id}")]
-        public async Task<ActionResult<Movie>> RentMovieToStudio(int id, Movie movie)
-        {
-            var movieToRent = _context.Movies.Find(id);
-            if (movieToRent.MaxAmount == 0)
-            {
-                return BadRequest();
-            }
-            movieToRent.MaxAmount --;
-            movieToRent.isRented = true;
-            await _context.SaveChangesAsync();
-            return movieToRent;
-        } 
 
         // GET: api/Movie/5
         [HttpGet("{id}")]
@@ -71,39 +56,7 @@ namespace API_v1.Controllers
             return movie;
         }
 
-        // PUT: Register a new movie to the database
-        [HttpPut("{id}")]
-        public async Task<IActionResult> CreateNewMovie(int id, Movie movie)
-        {
-            if (id != movie.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(movie).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MovieExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Movie
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        // Create new movie
         [HttpPost]
         public async Task<ActionResult<Movie>> PostMovie(Movie movie)
         {
@@ -113,7 +66,7 @@ namespace API_v1.Controllers
             return CreatedAtAction("GetMovie", new { id = movie.Id }, movie);
         }
 
-        // DELETE: api/Movie/5
+        // DELETE a movie from the database
         [HttpDelete("{id}")]
         public async Task<ActionResult<Movie>> DeleteMovie(int id)
         {

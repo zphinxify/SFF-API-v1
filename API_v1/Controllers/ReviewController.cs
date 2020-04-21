@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SFF;
 using SFF.Models;
 
 
@@ -44,8 +43,6 @@ namespace API_v1.Controllers
         }
 
         // PUT: api/Review/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReview(int id, Review review)
         {
@@ -75,16 +72,33 @@ namespace API_v1.Controllers
             return NoContent();
         }
 
-        // POST: api/Review
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Review>> PostReview(Review review)
+        // POST: api/Review/studioid/movieid 
+        [HttpPost("postreview/{studioid}/{movieid}")]
+        public async Task<ActionResult<Review>> PostReview(Review review, int studioId, int movieId)
         {
-            _context.Reviews.Add(review);
-            await _context.SaveChangesAsync();
+            var movieStudioToSetGrade = await _context.MovieStudios.Where(ms => ms.Id == studioId).FirstOrDefaultAsync();
+            var movieToGrade = await _context.Movies.Where(m => m.Id == movieId).FirstOrDefaultAsync();
+            if (movieToGrade != null && movieStudioToSetGrade != null)
+            {
+                if (review.Grade > 5 || review.Grade < 0)
+                {
+                    return StatusCode(400);
+                }
+                movieToGrade.AddReview(review, movieStudioToSetGrade);
+                await _context.SaveChangesAsync();
+                return StatusCode(201);
+            }
+            return StatusCode(400);
+        }
 
-            return CreatedAtAction("GetReview", new { id = review.Id }, review);
+        [HttpGet("Label/{movieid}/{studioid}")]
+        [Produces("application/xml")]
+        public async Task<Label> test(int movieId, int studioId)
+        {
+            var label = new Label();
+            var labelData = await label.CreateLabel(_context, movieId, studioId);
+            var XMLdata = label.LabelData(labelData);
+            return XMLdata;
         }
 
         // DELETE: api/Review/5

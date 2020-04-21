@@ -11,5 +11,15 @@ namespace SFF.Models
         public bool isRented { get; set; } = false;
 
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
+        // Adds review to the list containing reviews
+        public void AddReview(Review review, MovieStudio studio)
+        {
+            review.Studio = studio;
+            Reviews.Add(review);
+        }
+
+
+        
     }
 }

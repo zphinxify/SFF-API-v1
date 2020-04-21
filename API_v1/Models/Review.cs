@@ -11,6 +11,8 @@ namespace SFF.Models
         public int StudioId { get; set; }
         public MovieStudio Studio { get; set; }
 
+        
+
      
     }
 }
