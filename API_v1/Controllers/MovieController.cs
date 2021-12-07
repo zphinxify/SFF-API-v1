@@ -60,7 +60,10 @@ namespace API_v1.Controllers
         [HttpPost]
         public async Task<ActionResult<Movie>> PostMovie(Movie movie)
         {
-            _context.Movies.Add(movie);
+            if(movie != null) _context.Movies.Add(movie);
+
+            var somelist = new list<Model>();
+
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetMovie", new { id = movie.Id }, movie);
